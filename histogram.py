@@ -30,16 +30,24 @@ for i in range(0, col):
             a = a + 1
             
 
+_min = 0.0
+_max = 0.0
+
 for i in range(0, line):
-    print(X[i][15])
+    if (_min > X[i][15]):
+        _min = X[i][15]
+    if (_max < X[i][15]):
+        _max = X[i][15]
+#    print(X[i][15])
 
 print("\n\nnb_nan = ", a, "\n\n")
 
+print(_min, _max)
 plt.xlabel('Result')
 plt.ylabel('Number of student')
 age = [10, 25, 10.1, 10.2, 10.3, 10.4, 45, 65, 74 ,21 ,35 ,21 ,21 ,35, 28, 29]
 #bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
 #plt.hist(age, bins, histtype='bar', rwidth=0.8)
-bins = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-plt.hist(X[:,15], bins, histtype='bar')
+bins = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+plt.hist(X[:,15], bins, histtype='bar', cumulative=True)
 plt.show()
