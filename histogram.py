@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from matplotlib import colors
 #help(plt.hist)
 data = pd.read_csv("ressources/dataset_train.csv")
@@ -71,6 +72,35 @@ print("Gryffin = ", Gryffin)
 print("Slyther = ", Slyther)
 print("Raven = ", Raven)
 o = 0
+
+#for j in range(0, col):
+#   house_1 = []
+#    house_2 = []
+#    house_3 = []
+#    house_4 = []
+#    for i in range(0, line):
+ #       if (Y[i] == 'Hufflepuff'):
+ #           house_1.append(X[i, j])
+ #       if (Y[i] == 'Slytherin'):
+ #           house_2.append(X[i, j])
+ #       if (Y[i] == 'Gryffindor'):
+ #           house_3.append(X[i, j])
+ #       if (Y[i] == 'Ravenclaw'):
+ #           house_4.append(X[i, j])
+ #   if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
+ #           and name[j] != "Hogwarts House"):
+ #       o += 1
+ #       yellow_patch = mpatches.Patch(color='yellow', label='Hufflepuff')
+ #       red_patch = mpatches.Patch(color='red', label='Gryffindor')
+ #       green_patch = mpatches.Patch(color='green', label='Slytherin')
+ #       blue_patch = mpatches.Patch(color='blue', label='Ravenclaw')
+ #       plt.subplot(4, 4, o)
+ #       plt.xlabel(name[j])
+ #       plt.ylabel("Number of students")
+ #       plt.hist([house_1, house_2, house_3, house_4], bins = 'auto',
+ #               color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black')
+ #       plt.legend(handles=[yellow_patch, red_patch, green_patch, blue_patch], width=0.2)
+
 for j in range(0, col):
     house_1 = []
     house_2 = []
@@ -91,5 +121,11 @@ for j in range(0, col):
         plt.subplot(4, 4, o)
         plt.xlabel(name[j])
         plt.ylabel("Number of students")
-        plt.hist([house_1, house_2, house_3, house_4], bins = 'auto', color = ['yellow', 'red', 'green', 'black'], edgecolor = 'blue')
+        plt.hist([house_1, house_2, house_3, house_4], bins = 'auto',
+                color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black')
+        l1 = plt.bar(range(1), width=0, height=0, color='yellow')
+        l2 = plt.bar(range(1), width=0, height=0, color='red')
+        l3 = plt.bar(range(1), width=0, height=0, color='green')
+        l4 = plt.bar(range(1), width=0, height=0, color='blue')
+        plt.legend([l1, l2, l3 ,l4], ['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw'])
 plt.show()
