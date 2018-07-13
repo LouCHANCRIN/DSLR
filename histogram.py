@@ -20,32 +20,14 @@ for key in data:
     q = q + 1
 
 a = 0
-for i in range(0, col):
-    for j in range(0, line):
-        if (X[j][i] != X[j][i]):
-            X[j][i] = 0
-            a = a + 1
-
-print("\n\nnb_nan = ", a, "\n\n")
-
-Huffle = 0
-Gryffin = 0
-Slyther = 0
-Raven = 0
-for i in range(0, line):
-    if (Y[i] == 'Hufflepuff'):
-        Huffle = Huffle + 1
-    if (Y[i] == 'Slytherin'):
-        Gryffin = Gryffin + 1
-    if (Y[i] == 'Gryffindor'):
-        Slyther = Slyther + 1
-    if (Y[i] == 'Ravenclaw'):
-        Raven = Raven + 1
-
-print("Huffle = ", Huffle)
-print("Gryffin = ", Gryffin)
-print("Slyther = ", Slyther)
-print("Raven = ", Raven)
+def change_nan(X, col, line, data, name)
+    for i in range(0, col):
+        for j in range(0, line):
+            if (X[j][i] != X[j][i]):
+                X[j][i] = data[name[i]].mean()
+                a = a + 1
+    return (X)
+X = change_nan(X, col, line, data, name)
 
 o = 0
 for j in range(0, col):
@@ -70,7 +52,8 @@ for j in range(0, col):
         plt.xlabel(name[j])
         plt.ylabel("Number of students")
         plt.hist([house_1, house_2, house_3, house_4], bins = 'auto',
-                color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black')
+                color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black',
+                density=True)
         l1 = plt.bar(range(1), width=0, height=0, color='yellow')
         l2 = plt.bar(range(1), width=0, height=0, color='red')
         l3 = plt.bar(range(1), width=0, height=0, color='green')
