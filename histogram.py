@@ -63,7 +63,8 @@ for j in range(0, col):
         if (Y[i] == 'Ravenclaw'):
             house_4.append(X[i, j])
     if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
-            and name[j] != "Hogwarts House"):
+            and name[j] != "Hogwarts House" and name[j] != 'Index'
+            and name[j] != 'Best Hand'):
         o += 1
         plt.subplot(4, 4, o)
         plt.xlabel(name[j])
