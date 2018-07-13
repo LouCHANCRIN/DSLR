@@ -5,9 +5,7 @@ import matplotlib.patches as mpatches
 from matplotlib import colors
 #help(plt.hist)
 data = pd.read_csv("ressources/dataset_train.csv")
-print(data)
 line, col = np.shape(data)
-print(line, col)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
 X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House"], axis=1).values]
@@ -28,30 +26,7 @@ for i in range(0, col):
             X[j][i] = 0
             a = a + 1
 
-_min = 0.0
-_max = 0.0
-for i in range(0, line):
-    if (_min > X[i][15]):
-        _min = X[i][15]
-    if (_max < X[i][15]):
-        _max = X[i][15]
-
 print("\n\nnb_nan = ", a, "\n\n")
-print(_min, _max)
-#plt.xlabel('Result')
-#plt.ylabel('Number of student')
-age = [10, 25, 10.1, 10.2, 10.3, 10.4, 45, 65, 74 ,21 ,35 ,21 ,21 ,35, 28, 29]
-#bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130]
-#plt.hist(age, bins, histtype='bar', rwidth=0.8)
-bins = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-#plt.hist(X[:,15], bins, histtype='bar', cumulative=True)
-#for i in range(0, col):
-#    plt.hist(X[:,i], bins = 'auto')
-#x = []
-#for i in range(0, line):
-#    x.append(X[i, 16])
-#plt.hist(x, edgecolor = 'red', color = 'black')
-#plt.hist([x], bins = 'auto', color = ['blue', 'red'])
 
 Huffle = 0
 Gryffin = 0
@@ -71,36 +46,8 @@ print("Huffle = ", Huffle)
 print("Gryffin = ", Gryffin)
 print("Slyther = ", Slyther)
 print("Raven = ", Raven)
+
 o = 0
-
-#for j in range(0, col):
-#   house_1 = []
-#    house_2 = []
-#    house_3 = []
-#    house_4 = []
-#    for i in range(0, line):
- #       if (Y[i] == 'Hufflepuff'):
- #           house_1.append(X[i, j])
- #       if (Y[i] == 'Slytherin'):
- #           house_2.append(X[i, j])
- #       if (Y[i] == 'Gryffindor'):
- #           house_3.append(X[i, j])
- #       if (Y[i] == 'Ravenclaw'):
- #           house_4.append(X[i, j])
- #   if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
- #           and name[j] != "Hogwarts House"):
- #       o += 1
- #       yellow_patch = mpatches.Patch(color='yellow', label='Hufflepuff')
- #       red_patch = mpatches.Patch(color='red', label='Gryffindor')
- #       green_patch = mpatches.Patch(color='green', label='Slytherin')
- #       blue_patch = mpatches.Patch(color='blue', label='Ravenclaw')
- #       plt.subplot(4, 4, o)
- #       plt.xlabel(name[j])
- #       plt.ylabel("Number of students")
- #       plt.hist([house_1, house_2, house_3, house_4], bins = 'auto',
- #               color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black')
- #       plt.legend(handles=[yellow_patch, red_patch, green_patch, blue_patch], width=0.2)
-
 for j in range(0, col):
     house_1 = []
     house_2 = []
@@ -128,4 +75,6 @@ for j in range(0, col):
         l3 = plt.bar(range(1), width=0, height=0, color='green')
         l4 = plt.bar(range(1), width=0, height=0, color='blue')
         plt.legend([l1, l2, l3 ,l4], ['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw'])
+
+###mettre la moyenne de la colonne plutot que 0 a la place des nan
 plt.show()
