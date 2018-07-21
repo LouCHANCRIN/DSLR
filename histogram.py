@@ -14,13 +14,27 @@ name = []
 for key in data:
     name.append(key)
 
+def moy(X, line):
+    count = 0
+    _sum = 0
+    for l in range(0, line):
+        if (X[l] == X[l]):
+            _sum += X[l]
+            count += 1
+    return (_sum / count)
+
 def change_nan(X, col, line, data, name):
     a = 0
-    for i in range(0, col):
-        for j in range(0, line):
-            if (X[j][i] != X[j][i]):
-                X[j][i] = data[name[i]].mean()
-                a = a + 1
+    for c in range(0, col):
+        if (name[c] != "First Name" and name[c] != "Last Name" and name[c] != "Birthday"
+                and name[c] != 'Index' and name[c] != 'Hogwarts House'
+                and name[c] != 'Best Hand'):
+            _moy = moy(data[name[c]], line)
+            print(_moy, data[name[c]].mean())
+            for l in range(0, line):
+                if (X[l][c] != X[l][c]):
+                    X[l][c] = _moy
+                    a = a + 1
     return (X)
 
 X = change_nan(X, col, line, data, name)
@@ -42,7 +56,7 @@ def plot_histogramme(X, Y, name):
             if (Y[i] == 'Ravenclaw'):
                 house_4.append(X[i, j])
         if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
-                and name[j] != "Hogwarts House" and name[j] != 'Index'
+                and name[j] != 'Index' and name[j] != 'Hogwarts House'
                 and name[j] != 'Best Hand'):
             a += 1
             plt.subplot(4, 4, a)
