@@ -23,7 +23,6 @@ _max = np.reshape(_max, (col, 1))
 _mean = [[0.0] * col]
 _mean = np.reshape(_mean, (col, 1))
 
-
 def moy(X, line):
     count = 0
     _sum = 0
@@ -60,6 +59,22 @@ def scale(X, line, col):
         for l in range(0, line):
             X[l][c] = (X[l][c] - _mean[c]) / (_max[c] - _min[c])
     return (X)
+
+
+
+
+
+
+
+def log_reg(X, Y, theta, line, col, alpha, num_iters):
+    temp = [[0.0] * col]
+    temp = np.reshape(temp, (col, 1))
+    for i in range(0, num_iters):
+        for c in range(0, col):
+            temp[c] = ...
+        for c in range(0, col):
+            theta[c] = temp[c]
+    return (theta)
 
 X = change_nan(X, col, line)
 X = scale(X, line, col)
