@@ -13,8 +13,15 @@ X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House", "First Name",
 col -= 7
 X = np.reshape(X, (line, col))
 
-theta = [[0.0] * col]
-theta = np.reshape(theta, (col, 1))
+theta = {}
+theta['Hufflepuff'] = [[0.0] * col]
+theta['Gryffindor'] = [[0.0] * col]
+theta['Slytherin'] = [[0.0] * col]
+theta['Ravenclaw'] = [[0.0] * col]
+theta['Hufflepuff'] = np.reshape(theta['Hufflepuff'], (col, 1))
+theta['Gryffindor'] = np.reshape(theta['Gryffindor'], (col, 1))
+theta['Slytherin'] = np.reshape(theta['Slytherin'], (col, 1))
+theta['Ravenclaw'] = np.reshape(theta['Ravenclaw'], (col, 1))
 
 _min = [[0.0] * col]
 _min = np.reshape(_min, (col, 1))
@@ -80,21 +87,21 @@ def cost(X, Y, theta, line, c, expected):
         som += res
     return (som)
 
-def log_reg(X, Y, theta, line, col, alpha, num_iters, result):
+def log_reg(X, Y, theta, line, col, alpha, num_iters, landa):
     temp = [[0.0] * col]
     temp = np.reshape(temp, (col, 1))
     for i in range(0, num_iters):
         print(i)
-        for exp in range(0, 3):
+        for key in theta:
             for c in range(0, col):
-                temp[c] = theta[c] - (alpha * cost(X, Y, theta, line, c, result[exp]))
+                temp[c] = theta[key][c] - (alpha * cost(X, Y, theta[key], line, c, key))
             for c in range(0, col):
-                theta[c] = temp[c]
+                theta[key][c] = (1 - alpha * (landa / line)) * temp[c]
     return (theta)
 
-result = ['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw']
 alpha = 0.01
 num_iters = 1500
+landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
-theta = log_reg(X, Y, theta, line, col, alpha, num_iters, result)
+theta = log_reg(X, Y, theta, line, col, alpha, num_iters, landa)
