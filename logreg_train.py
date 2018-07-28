@@ -14,14 +14,21 @@ col -= 7
 X = np.reshape(X, (line, col))
 
 theta = {}
-theta['Hufflepuff'] = [[0.0] * col]
-theta['Gryffindor'] = [[0.0] * col]
-theta['Slytherin'] = [[0.0] * col]
-theta['Ravenclaw'] = [[0.0] * col]
-theta['Hufflepuff'] = np.reshape(theta['Hufflepuff'], (col, 1))
-theta['Gryffindor'] = np.reshape(theta['Gryffindor'], (col, 1))
-theta['Slytherin'] = np.reshape(theta['Slytherin'], (col, 1))
-theta['Ravenclaw'] = np.reshape(theta['Ravenclaw'], (col, 1))
+theta['Hufflepuff'] = np.reshape([[0.0] * col], (col, 1))
+theta['Gryffindor'] = np.reshape([[0.0] * col], (col, 1))
+theta['Slytherin'] = np.reshape([[0.0] * col], (col, 1))
+theta['Ravenclaw'] = np.reshape([[0.0] * col], (col, 1))
+
+house = {}
+house['Hufflepuff'] = np.reshape([[0.0] * line], (line, 1))
+house['Gryffindor'] = np.reshape([[0.0] * line], (line, 1))
+house['Slytherin'] = np.reshape([[0.0] * line], (line, 1))
+house['Ravenclaw'] = np.reshape([[0.0] * line], (line, 1))
+
+for key in house:
+    for i in range(0, line):
+        if (Y[i] == key):
+            house[key][i] = 1
 
 _min = [[0.0] * col]
 _min = np.reshape(_min, (col, 1))
@@ -69,34 +76,25 @@ def scale(X, line, col):
             X[l][c] = (X[l][c] - _mean[c]) / (_max[c] - _min[c])
     return (X)
 
-def hypothese(Xline, theta, l):
-    TX = Xline
-    p = TX.dot(theta)
-    ret = 1 / (1 + np.exp(-p))
+def hypothese(Xline, theta):
+    return (1 / (1 + np.exp(-(Xline.dot(theta)))))
+
+def cost(X, Y, theta, line, c):
+    hyp = hypothese(X, theta) #hypothese
+    XX = np.reshape(X[:,c], (1, line))
+    ret = XX.dot(hyp - Y) #cost
     return (ret)
 
-def cost(X, Y, theta, line, c, expected):
-    som = 0
-    for l in range(0, line):
-        if (Y[l] == expected):
-            y = 0
-        else:
-            y = 1
-        hyp = hypothese(X[l], theta, l)
-        res = (hyp - y) * X[l][c]
-        som += res
-    return (som)
-
-def log_reg(X, Y, theta, line, col, alpha, num_iters, landa):
+def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
     temp = [[0.0] * col]
     temp = np.reshape(temp, (col, 1))
     for i in range(0, num_iters):
         print(i)
         for key in theta:
             for c in range(0, col):
-                temp[c] = theta[key][c] - (alpha * cost(X, Y, theta[key], line, c, key))
+                temp[c] = theta[key][c] - (alpha * cost(X, house[key], theta[key], line, c))
             for c in range(0, col):
-                theta[key][c] = (1 - alpha * (landa / line)) * temp[c]
+                theta[key][c] = temp[c]#(1 - alpha * (landa / line)) * temp[c]
     return (theta)
 
 alpha = 0.01
@@ -104,4 +102,4 @@ num_iters = 1500
 landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
-theta = log_reg(X, Y, theta, line, col, alpha, num_iters, landa)
+theta = log_reg(X, theta, line, col, alpha, num_iters, landa, house)
