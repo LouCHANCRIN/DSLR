@@ -7,10 +7,10 @@ line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
 X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House", "First Name",
-    "Last Name", "Birthday", "Index", "Best Hand", "Arithmancy",
+    "Last Name", "Birthday", "Index", "Best Hand", "Arithmancy", "Astronomy",
     "Care of Magical Creatures"], axis=1).values]
 
-col -= 7
+col -= 8
 X = np.reshape(X, (line, col))
 
 theta = {}
@@ -89,17 +89,44 @@ def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
     temp = [[0.0] * col]
     temp = np.reshape(temp, (col, 1))
     for i in range(0, num_iters):
-        print(i)
         for key in theta:
             for c in range(0, col):
                 temp[c] = theta[key][c] - (alpha * cost(X, house[key], theta[key], line, c))
             for c in range(0, col):
-                theta[key][c] = temp[c]#(1 - alpha * (landa / line)) * temp[c]
+                theta[key][c] = temp[c] #(1 - alpha * (landa / line)) * temp[c]
     return (theta)
 
 alpha = 0.01
-num_iters = 1500
+num_iters = 11
 landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
 theta = log_reg(X, theta, line, col, alpha, num_iters, landa, house)
+
+def precision(theta, Y, X, line):
+    for key in theta:
+        print(key)
+        a = 0
+        b = 0
+        for l in range(0, line):
+            if (key == Y[l]):
+                b += 1
+                if (1 / (1 + np.exp(-(X[l].dot(theta[key])))) >= 0.5):
+                    a += 1
+        print(a)
+        print(b)
+        print((a * 100 / b))
+
+def precision_global(theta, Y, X, line):
+    a = 0
+    print("global precision :")
+    for l in range(0, line):
+        for key in theta:
+            if (1 / (1 + np.exp(-(X[l].dot(theta[key])))) >= 0.5):
+                if (Y[l] == key):
+                    a += 1
+    print(a)
+    print(a * 100 / line)
+
+precision(theta, Y, X, line)
+precision_global(theta, Y, X, line)
