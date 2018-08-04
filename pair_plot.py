@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
-data = pd.read_csv("ressources/dataset_train.csv")
+ressource = sys.arg[1]
+data = pd.read_csv(ressources)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
@@ -38,10 +40,6 @@ def change_nan(X, col, line, data, name):
 def pair_plot(X, name, col, line, Y):
     a = 1
     for c in range(1, col):
-        #if (c + 5 < col):
-        #    x = c + 5
-        #else:
-        #    x = col
         for c2 in range (0, col):
             if (name[c] != 'First Name' and name[c] != 'Last Name'
                 and name[c] != 'Birthday' and name[c] != 'Index'
@@ -59,32 +57,27 @@ def pair_plot(X, name, col, line, Y):
                 H2['Gryffindor'] = []
                 H2['Slytherin'] = []
                 H2['Ravenclaw'] = []
-
                 for l in range(0, line):
                     if (Y[l] == 'Hufflepuff'):
                         if (X[l][c] == X[l][c]):
                             H1['Hufflepuff'].append(X[l][c])
                         if (X[l][c2] == X[l][c2]):
                             H2['Hufflepuff'].append(X[l][c2])
-
                     if (Y[l] == 'Gryffindor'):
                         if (X[l][c] == X[l][c]):
                             H1['Gryffindor'].append(X[l][c])
                         if (X[l][c2] == X[l][c2]):
                             H2['Gryffindor'].append(X[l][c2])
-
                     if (Y[l] == 'Slytherin'):
                         if (X[l][c] == X[l][c]):
                             H1['Slytherin'].append(X[l][c])
                         if (X[l][c2] == X[l][c2]):
                             H2['Slytherin'].append(X[l][c2])
-
                     if (Y[l] == 'Ravenclaw'):
                         if (X[l][c] == X[l][c]):
                             H1['Ravenclaw'].append(X[l][c])
                         if (X[l][c2] == X[l][c2]):
                             H2['Ravenclaw'].append(X[l][c2])
-
                 if (c == c2):
                     plt.subplot(5, 5, a)
                     plt.xlabel(name[c])

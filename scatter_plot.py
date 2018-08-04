@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
-data = pd.read_csv("ressources/dataset_train.csv")
+ressource = sys.arg[1]
+data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
@@ -80,32 +82,27 @@ def scatter_plot(X, name, same, line, Y):
         H2['Gryffindor'] = []
         H2['Slytherin'] = []
         H2['Ravenclaw'] = []
-
         for l in range(0, line):
             if (Y[l] == 'Hufflepuff'):
                 if (X[l][same[c]] == X[l][same[c]]):
                     H1['Hufflepuff'].append(X[l][same[c]])
                 if (X[l][same[c + 1]] == X[l][same[c + 1]]):
                     H2['Hufflepuff'].append(X[l][same[c + 1]])
-
             if (Y[l] == 'Gryffindor'):
                 if (X[l][same[c]] == X[l][same[c]]):
                     H1['Gryffindor'].append(X[l][same[c]])
                 if (X[l][same[c + 1]] == X[l][same[c + 1]]):
                     H2['Gryffindor'].append(X[l][same[c + 1]])
-
             if (Y[l] == 'Slytherin'):
                 if (X[l][same[c]] == X[l][same[c]]):
                     H1['Slytherin'].append(X[l][same[c]])
                 if (X[l][same[c + 1]] == X[l][same[c + 1]]):
                     H2['Slytherin'].append(X[l][same[c + 1]])
-
             if (Y[l] == 'Ravenclaw'):
                 if (X[l][same[c]] == X[l][same[c]]):
                     H1['Ravenclaw'].append(X[l][same[c]])
                 if (X[l][same[c + 1]] == X[l][same[c + 1]]):
                     H2['Ravenclaw'].append(X[l][same[c + 1]])
-
         plt.xlabel(name[same[c]])
         plt.ylabel(name[same[c + 1]])
         plt.scatter(H1['Hufflepuff'], H2['Hufflepuff'], color='yellow', edgecolor='black')

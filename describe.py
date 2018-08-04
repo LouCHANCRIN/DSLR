@@ -1,9 +1,10 @@
+import sys
 import pandas as pd
 import numpy as np
 import math
 
-data = pd.read_csv("ressources/dataset_train.csv")
-print(pd.DataFrame.describe(data))
+ressource = sys.argv[1]
+data = pd.read_csv(ressource)
 line, col = np.shape(data)
 X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House"], axis=1).values]
 X = np.reshape(X, (line, col))

@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
-data = pd.read_csv("ressources/dataset_train.csv")
+ressource = sys.arg[1]
+data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
@@ -93,7 +95,7 @@ def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
             for c in range(0, col):
                 temp[c] = theta[key][c] - (alpha * cost(X, house[key], theta[key], line, c))
             for c in range(0, col):
-                theta[key][c] = temp[c] #(1 - alpha * (landa / line)) * temp[c]
+                theta[key][c] = temp[c]
     return (theta)
 
 alpha = 0.01

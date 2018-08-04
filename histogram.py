@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 #help(plt.hist)
 
-data = pd.read_csv("ressources/dataset_train.csv")
+ressource = sys.arg[1]
+data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
@@ -65,11 +67,6 @@ def plot_histogramme(X, Y, name):
             plt.hist([house_1, house_2, house_3, house_4], bins = 'auto',
                     color = ['yellow', 'red', 'green', 'blue'], edgecolor = 'black',
                     density=True)
-#            l1 = plt.bar(range(1), width=0, height=0, color='yellow')
-#            l2 = plt.bar(range(1), width=0, height=0, color='red')
-#            l3 = plt.bar(range(1), width=0, height=0, color='green')
-#            l4 = plt.bar(range(1), width=0, height=0, color='blue')
-#            plt.legend([l1, l2, l3 ,l4], ['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw'])
             plt.legend(['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw'])
 
 plot_histogramme(X, Y, name)
