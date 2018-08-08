@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-ressource = sys.arg[1]
+ressource = sys.argv[1]
 data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
@@ -93,42 +93,54 @@ def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
     for i in range(0, num_iters):
         for key in theta:
             for c in range(0, col):
-                temp[c] = theta[key][c] - (alpha * cost(X, house[key], theta[key], line, c))
+                temp[c] = theta[key][c] - ((alpha / line) * cost(X, house[key], theta[key], line, c))
             for c in range(0, col):
                 theta[key][c] = temp[c]
     return (theta)
 
-alpha = 0.01
-num_iters = 11
+alpha = 0.05
+num_iters = 300
 landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
 theta = log_reg(X, theta, line, col, alpha, num_iters, landa, house)
 
 def precision(theta, Y, X, line):
-    for key in theta:
-        print(key)
-        a = 0
-        b = 0
-        for l in range(0, line):
-            if (key == Y[l]):
-                b += 1
-                if (1 / (1 + np.exp(-(X[l].dot(theta[key])))) >= 0.5):
-                    a += 1
-        print(a)
-        print(b)
-        print((a * 100 / b))
-
-def precision_global(theta, Y, X, line):
-    a = 0
-    print("global precision :")
+    my_y = []
     for l in range(0, line):
+        H = 0
+        G = 0
+        S = 0
+        R = 0
         for key in theta:
-            if (1 / (1 + np.exp(-(X[l].dot(theta[key])))) >= 0.5):
-                if (Y[l] == key):
-                    a += 1
+            if (key == 'Hufflepuff'):
+                H = 1 / (1 + np.exp(-(X[l].dot(theta[key]))))
+            if (key == 'Gryffindor'):
+                G = 1 / (1 + np.exp(-(X[l].dot(theta[key]))))
+            if (key == 'Slytherin'):
+                S = 1 / (1 + np.exp(-(X[l].dot(theta[key]))))
+            if (key == 'Ravenclaw'):
+                R = 1 / (1 + np.exp(-(X[l].dot(theta[key]))))
+        myguess = H
+        if (G > H and G > myguess):
+            myguess = G
+        if (S > G and S > myguess):
+            myguess = S
+        if (R > S and R > myguess):
+            myguess = R
+        if (myguess == H):
+            my_y.append("Hufflepuff")
+        if (myguess == G):
+            my_y.append("Gryffindor")
+        if (myguess == S):
+            my_y.append("Slytherin")
+        if (myguess == R):
+            my_y.append("Ravenclaw")
+    a = 0
+    for l in range(0, line):
+        if (my_y[l] == Y[l]):
+            a += 1
     print(a)
     print(a * 100 / line)
 
 precision(theta, Y, X, line)
-precision_global(theta, Y, X, line)
