@@ -78,10 +78,20 @@ def scale(X, line, col):
             X[l][c] = (X[l][c] - _mean[c]) / (_max[c] - _min[c])
     return (X)
 
+def somme(Yline, hypline):
+    return ((Yline * np.log10(hypline)) + ((1 - Yline) * np.log10(1 - hypline)))
+
+def cost(theta, X, Y, line):
+    som = 0
+    hyp = hypothese(X, theta)
+    som = somme(Y, hyp)
+    som = np.sum(som)
+    return (-1 / line * som)
+
 def hypothese(Xline, theta):
     return (1 / (1 + np.exp(-(Xline.dot(theta)))))
 
-def cost(X, Y, theta, line, c):
+def gradient(X, Y, theta, line, c):
     hyp = hypothese(X, theta) #hypothese
     XX = np.reshape(X[:,c], (1, line))
     ret = XX.dot(hyp - Y) #cost
@@ -90,19 +100,41 @@ def cost(X, Y, theta, line, c):
 def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
     temp = [[0.0] * col]
     temp = np.reshape(temp, (col, 1))
+    cost_gen = []
+    cost_plot = {}
+    cost_plot['Hufflepuff'] = []
+    cost_plot['Gryffindor'] = []
+    cost_plot['Slytherin'] = []
+    cost_plot['Ravenclaw'] = []
     for i in range(0, num_iters):
         for key in theta:
+            cout = 0
             for c in range(0, col):
-                temp[c] = theta[key][c] - ((alpha / line) * cost(X, house[key], theta[key], line, c))
+                gradient(X, house[key], theta[key], line, c)
+                temp[c] = theta[key][c] - (alpha * gradient(X, house[key], theta[key], line, c))
             for c in range(0, col):
                 theta[key][c] = temp[c]
+            cout = cost(theta[key], X, house[key], line)
+            cost_plot[key].append(cout)
+        cost_gen.append(cout / 4)
+    for key in cost_plot:
+        cost_plot[key] = np.reshape(cost_plot[key], (num_iters, 1))
+        plt.xlabel(key)
+        plt.plot(cost_plot[key])
+        plt.show()
+    cost_gen = np.reshape(cost_gen,(num_iters, 1))
+    plt.xlabel("general")
+    plt.plot(cost_gen)
+    plt.show()
     return (theta)
 
-alpha = 0.05
-num_iters = 300
+alpha = 0.05 / line
+num_iters = 2300
 landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
+#X_train, X_cost = X[ : floor(row * 0.85)], X[floor(row * 0.85) :]
+#Y_train, Y_cost = Y[ : floor(row * 0.85)], Y[floor(row * 0.85) :]
 theta = log_reg(X, theta, line, col, alpha, num_iters, landa, house)
 
 def precision(theta, Y, X, line):
@@ -141,6 +173,7 @@ def precision(theta, Y, X, line):
         if (my_y[l] == Y[l]):
             a += 1
     print(a)
-    print(a * 100 / line)
+    print("Accuracy  : ", a * 100 / line)
+    print("Precision : ", a / (a - (line - a)))
 
 precision(theta, Y, X, line)
