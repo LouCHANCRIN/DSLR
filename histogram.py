@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 #help(plt.hist)
 
-ressource = sys.arg[1]
+ressource = sys.argv[1]
 data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]

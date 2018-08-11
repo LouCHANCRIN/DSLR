@@ -78,21 +78,15 @@ def scale(X, line, col):
             X[l][c] = (X[l][c] - _mean[c]) / (_max[c] - _min[c])
     return (X)
 
-def somme(Yline, hypline):
-    return ((Yline * np.log10(hypline)) + ((1 - Yline) * np.log10(1 - hypline)))
-
 def cost(theta, X, Y, line):
     som = 0
-    hyp = hypothese(X, theta)
-    som = somme(Y, hyp)
+    hyp = 1 / (1 + np.exp(-(X.dot(theta)))) #hypothese sigmoid
+    som = (Y * np.log10(hyp)) + ((1 - Y) * np.log10(1 - hyp)) #cost function
     som = np.sum(som)
     return (-1 / line * som)
 
-def hypothese(Xline, theta):
-    return (1 / (1 + np.exp(-(Xline.dot(theta)))))
-
 def gradient(X, Y, theta, line, c):
-    hyp = hypothese(X, theta) #hypothese
+    hyp = 1 / (1 + np.exp(-(X.dot(theta)))) #hypothese sigmoid
     XX = np.reshape(X[:,c], (1, line))
     ret = XX.dot(hyp - Y) #cost
     return (ret)
@@ -129,7 +123,7 @@ def log_reg(X, theta, line, col, alpha, num_iters, landa, house):
     return (theta)
 
 alpha = 0.05 / line
-num_iters = 2300
+num_iters = 300
 landa = 5
 X = change_nan(X, col, line)
 X = scale(X, line, col)
