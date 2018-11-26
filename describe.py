@@ -110,4 +110,3 @@ for l in range(0, 9):
                 print("75%      ")
             if (l == 8):
                 print("Max    ")
-            

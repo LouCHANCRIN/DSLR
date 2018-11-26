@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 
 ressource = sys.argv[1]
-data = pd.read_csv(ressources)
+data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
 Y= np.reshape(Y, (line, 1))
