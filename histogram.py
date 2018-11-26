@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
-#help(plt.hist)
 
 ressource = sys.argv[1]
 data = pd.read_csv(ressource)
@@ -32,7 +31,6 @@ def change_nan(X, col, line, data, name):
                 and name[c] != 'Index' and name[c] != 'Hogwarts House'
                 and name[c] != 'Best Hand'):
             _moy = moy(data[name[c]], line)
-            print(_moy, data[name[c]].mean())
             for l in range(0, line):
                 if (X[l][c] != X[l][c]):
                     X[l][c] = _moy
