@@ -2,7 +2,7 @@
 
 ### About DSLR :
 
-* DSLR goal is to guess in which class a student shoudl be according to his school marks
+* DSLR goal is to guess in which class a student should be according to his school marks
 * To do that I did script to visualize the data in differents ways
 
 ### About the code :
