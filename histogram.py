@@ -3,11 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+TO_EXCLUDE = ["First Name", "Last Name", "Birthday", 'Index', 'Hogwarts House', 'Best Hand']
+
 ressource = sys.argv[1]
 data = pd.read_csv(ressource)
 line, col = np.shape(data)
 Y = data["Hogwarts House"]
-Y= np.reshape(Y, (line, 1))
+# Y= np.reshape(Y, (line, 1))
 X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House"], axis=1).values]
 X = np.reshape(X, (line, col))
 
@@ -27,9 +29,7 @@ def moy(X, line):
 def change_nan(X, col, line, data, name):
     a = 0
     for c in range(0, col):
-        if (name[c] != "First Name" and name[c] != "Last Name" and name[c] != "Birthday"
-                and name[c] != 'Index' and name[c] != 'Hogwarts House'
-                and name[c] != 'Best Hand'):
+        if (name[c] not in TO_EXCLUDE):
             _moy = moy(data[name[c]], line)
             for l in range(0, line):
                 if (X[l][c] != X[l][c]):
@@ -55,9 +55,7 @@ def plot_histogramme(X, Y, name):
                 house_3.append(X[i, j])
             if (Y[i] == 'Ravenclaw'):
                 house_4.append(X[i, j])
-        if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
-                and name[j] != 'Index' and name[j] != 'Hogwarts House'
-                and name[j] != 'Best Hand'):
+        if (name[j] not in TO_EXCLUDE):
             a += 1
             plt.subplot(4, 4, a)
             plt.xlabel(name[j])

@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+TO_EXCLUDE = ["First Name", "Last Name", "Birthday", 'Index', 'Hogwarts House', 'Best Hand']
+
 ressource = sys.argv[1]
 data = pd.read_csv(ressource)
 line, col = np.shape(data)
@@ -29,9 +31,7 @@ def moy(X, line):
 def change_nan(X, col, line, data, name):
     a = 0
     for c in range(0, col):
-        if (name[c] != "First Name" and name[c] != "Last Name" and name[c] != "Birthday"
-            and name[c] != 'Index' and name[c] != 'Hogwarts House'
-            and name[c] != 'Best Hand'):
+        if (name[c] not in TO_EXCLUDE):
                 _moy = moy(data[name[c]], line)
                 for l in range(0, line):
                     if (X[l][c] != X[l][c]):
@@ -59,7 +59,7 @@ def scatter_plot(X, name, index, line, Y):
 
 if __name__ == '__main__':
     Y = data["Hogwarts House"]
-    Y = np.reshape(Y, (line, 1))
+    # Y = np.reshape(Y, (line, 1))
     X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House"], axis=1).values]
     X = np.reshape(X, (line, col))
 
