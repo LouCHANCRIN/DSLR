@@ -51,19 +51,19 @@ def gradient(alpha, matrix, expected_results, theta, c, args):
     updated_weigths = column_data.dot(sigmoid_result - expected_results)
     return updated_weigths
 
-def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, args, matrix_test=None, test_expected_house_list=None):
+def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, args, matrix_test=None, test_expected_house_object=None, test_expected_house_list=None):
     temp = np.reshape([[0.0] * col_train], (col_train, 1))
     if args.loss:
         cost_plot = {'Hufflepuff': [], 'Gryffindor': [], 'Slytherin': [], 'Ravenclaw': []}
     if args.early_stopping:
-        best_loss = 0
+        best_loss = None
         unchanged_epoch = 0
 
     for i in range(0, num_iters):
         # Loop on houses for the one vs all algorithm
         for key in theta:
             cost = 0
-            current_general_cost = 0
+            current_general_loss = 0
             # Recalculate the weights (theta) for each feature and save it in a temporary variable
             for index in range(0, col_train):
                 temp[index] = theta[key][index] - ((alpha  / line_train) * gradient(alpha, matrix_train, train_expected_house_object[key], theta[key], index, args))
@@ -74,25 +74,24 @@ def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, 
                 cost = cost_function(alpha, theta[key], matrix_train, train_expected_house_object[key], args)
                 cost_plot[key].append(cost)
             if args.early_stopping:
-                if args.loss:
-                    current_general_cost += cost
-                else:
-                    current_general_cost += cost_function(alpha, theta[key], matrix_train, train_expected_house_object[key], args)
+                    current_general_loss += cost_function(alpha, theta[key], matrix_test, test_expected_house_object[key], args)
 
         if args.early_stopping:
-            print(i, current_general_cost, best_loss)
+            print(i, current_general_loss, best_loss)
             print()
-            if current_general_cost < best_loss:
-                best_loss = current_general_cost
-            elif current_general_cost + 0.1 > best_loss:
+            if best_loss == None:
+                best_loss = current_general_loss
+            elif current_general_loss + 0.05 / i < best_loss:
                 break
-            elif current_general_cost == best_loss:
+            elif current_general_loss < best_loss:
+                best_loss = current_general_loss
+            elif current_general_loss == best_loss:
                 unchanged_epoch += 1
             if unchanged_epoch == 5:
                 break
 
     if args.loss:
-        plot(cost_plot, num_iters)
+        plot(cost_plot, i + 1)
 
     return theta
 
@@ -114,12 +113,11 @@ def main(matrix_train, train_houses_list, args, matrix_test=None, test_houses_li
         test_expected_house = format_data.initialize_arrays(line_test, HOUSES)
         matrix_test = format_data.scale(np.reshape(matrix_test, (line_test, col_test)), line_test, col_test)
         test_expected_house_object = format_data.set_house(test_expected_house, test_houses_list)
+    else:
+        test_expected_house_object = None
 
     # Launch the logistic regression
-    theta = log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, args, matrix_test, test_houses_list)
-
-    print(f"Accuracy : {metrics.precision(theta, train_houses_list, matrix_train, line_train)}")
-    print(f"Accuracy : {metrics.precision(theta, test_houses_list, matrix_test, line_test)}")
+    theta = log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, args, matrix_test, test_expected_house_object, test_houses_list)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parse for bonus')
