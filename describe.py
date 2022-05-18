@@ -4,109 +4,97 @@ import numpy as np
 import math
 
 ressource = sys.argv[1]
-data = pd.read_csv(ressource)
-line, col = np.shape(data)
-X = [np.insert(row, 0, 1) for row in data.drop(["Hogwarts House"], axis=1).values]
-X = np.reshape(X, (line, col))
+df = pd.read_csv(ressource)
 
-name = []
-for key in data:
-    name.append(key)
+df = df.drop(['First Name', 'Last Name', 'Best Hand', 'Birthday'], axis=1)
+line, col = np.shape(df)
 
-def sort_data(X):
-    for c in range(0, col):
-        for l in range(0, line):
-            for l2 in range(l, line):
-                if (X[l][c] == X[l][c] and X[l2][c] == X[l2][c]):
-                    if (X[l][c] > X[l2][c]):
-                        tmp = X[l][c]
-                        X[l][c] = X[l2][c]
-                        X[l2][c] = tmp
-    return (X)
+data_to_sort = {}
+for column in df.columns.values.tolist():
+    data_to_sort[column] = df[column].to_list()
 
-X = sort_data(X)
+display = {'Count': {}, 'Mean': {}, 'std': {}, 'min': {}, '25%': {}, '50%': {}, '75%': {}, 'max': {}}
 
-def fill_feature(X, line, name):
-    feature = []
-    for j in range(0, col):
-        if (name[j] != "First Name" and name[j] != "Last Name" and name[j] != "Birthday"
-                and name[j] != "Hogwarts House" and name[j] != 'Index'
-                and name[j] != 'Best Hand'):
-            count = 0
-            mean = 0
-            ma = X[0][j]
-            mi = X[0][j]
-            for i in range(0, line):
-                if (X[i][j] == X[i][j]):
-                    if (X[i][j] > ma):
-                        ma = X[i][j]
-                    if (X[i][j] < mi):
-                        mi = X[i][j]
-                    mean += X[i][j]
-                    count += 1
+def sort_data(data_to_sort):
+    for key in data_to_sort:
+        display['Count'][key] = len(data_to_sort[key])
+
+        # Remove NaN after storing the total number of elements
+        data_to_sort[key] = [x for x in data_to_sort[key] if x == x]
+
+        for i in range(0, len(data_to_sort[key])):
+            for j in range(0, len(data_to_sort[key])):
+                # Both not NaN
+                if (data_to_sort[key][i] == data_to_sort[key][i] and data_to_sort[key][j] == data_to_sort[key][j]):
+                    # Swap
+                    if (data_to_sort[key][i] > data_to_sort[key][j]):
+                        tmp = data_to_sort[key][i]
+                        data_to_sort[key][i] = data_to_sort[key][j]
+                        data_to_sort[key][j] = tmp
+    return data_to_sort
+
+sorted_data= sort_data(data_to_sort)
+
+def fill_feature(sorted_data):
+    for column in sorted_data:
+        column_length = len(sorted_data[column])
+        display['Count'][column] = column_length
+
+        if column_length == 0:
+            display['Mean'][column] = 'NaN'
+            display['std'][column] = 'NaN'
+            display['min'][column] = 'NaN'
+            display['25%'][column] = 'NaN'
+            display['50%'][column] = 'NaN'
+            display['75%'][column] = 'NaN'
+            display['max'][column] = 'NaN'
+        else:
+            calculated_mean = 0
+
+            min_found = sorted_data[column][0]
+            max_found = sorted_data[column][0]
+            valid_value_count = 0
+            for i in range(0, column_length):
+                valid_value_count += 1
+                calculated_mean += sorted_data[column][i]
+
+                if sorted_data[column][i] > max_found:
+                    max_found = sorted_data[column][i]
+
+                if sorted_data[column][i] < min_found:
+                    min_found = sorted_data[column][i]
+
+            calculated_mean /= column_length
             std = 0
-            mean /= count
-            for i in range(0, line):
-                if (X[i][j] == X[i][j]):
-                    std += (X[i][j] - mean) ** 2
-            std /= count
+            for i in range(0, column_length):
+                std += (sorted_data[column][i] - calculated_mean) ** 2
+            std /= column_length
             std = math.sqrt(std)
-            feature.append(count)
-            feature.append(mean)
-            feature.append(std)
-            feature.append(mi)
-#           premier quartil
-            q = round(count / 4, 0)
-            _25 = 0
-            while (_25 < q):
-                _25 += 1
-#           deuxieme quartil
-            q = round(count / 2, 0)
-            _50 = 0
-            while (_50 < q):
-                _50 += 1
-#           troisieme quartil
-            q = round(count - (count / 4), 0)
-            _75 = 0
-            while (_75 < q):
-                _75 += 1
-#           ok
-            while (X[_25][j] != X[_25][j]):
-                _25 += 1
-            while (X[_50][j] != X[_50][j]):
-                _50 += 1
-            while (X[_75][j] != X[_75][j]):
-                _75 += 1
-            print("25 = ", _25, "50 = ", _50, "75 = ", _75)
-            feature.append(X[_25][j])
-            feature.append(X[_50][j])
-            feature.append(X[_75][j])
-            feature.append(ma)
-    return (feature)
 
-feature = fill_feature(X, line, name)
 
-feature = np.reshape(feature, (8, 13))
-print(feature)
+            p_25 = str(sorted_data[column][int(valid_value_count * 0.75)])
+            p_50 = str(sorted_data[column][int(valid_value_count * 0.5)])
+            p_75 = str(sorted_data[column][int(valid_value_count * 0.25)])
+            
+            display['Mean'][column] = str(calculated_mean)[0:min(len(str(calculated_mean)), len(column))]
+            display['std'][column] = str(std)[0:min(len(str(std)), len(column))]
+            display['min'][column] = str(min_found)[0:min(len(str(min_found)), len(column))]
+            display['25%'][column] = p_25[0:min(len(p_25), len(column))]
+            display['50%'][column] = p_50[0:min(len(p_50), len(column))]
+            display['75%'][column] = p_75[0:min(len(p_75), len(column))]
+            display['max'][column] = str(max_found)[0:min(len(str(max_found)), len(column))]
+    return display
 
-for l in range(0, 9):
-    for c in range(0, col + 1):
-        if (c == 0):
-            if (l == 0):
-                print("         ")
-            if (l == 1):
-                print("Count    ")
-            if (l == 2):
-                print("Mean     ")
-            if (l == 3):
-                print("Std      ")
-            if (l == 4):
-                print("Min      ")
-            if (l == 5):
-                print("25%      ")
-            if (l == 6):
-                print("50%      ")
-            if (l == 7):
-                print("75%      ")
-            if (l == 8):
-                print("Max    ")
+display = fill_feature(sorted_data)
+
+order = list(display['Count'].keys())
+
+print(f"      | {' | '.join([x for x in order])}")
+print(f"Count | {' | '.join([' ' * max(0, len(x) - len(str(display['Count'][x]))) + str(display['Count'][x]) for x in order])}")
+print(f"Mean  | {' | '.join([' ' * max(0, len(x) - len(str(display['Mean'][x]))) + str(display['Mean'][x]) for x in order])}")
+print(f"Std   | {' | '.join([' ' * max(0, len(x) - len(str(display['std'][x]))) + str(display['std'][x]) for x in order])}")
+print(f"Min   | {' | '.join([' ' * max(0, len(x) - len(str(display['min'][x]))) + str(display['min'][x]) for x in order])}")
+print(f"25%   | {' | '.join([' ' * max(0, len(x) - len(str(display['25%'][x]))) + str(display['25%'][x]) for x in order])}")
+print(f"50%   | {' | '.join([' ' * max(0, len(x) - len(str(display['50%'][x]))) + str(display['50%'][x]) for x in order])}")
+print(f"75%   | {' | '.join([' ' * max(0, len(x) - len(str(display['75%'][x]))) + str(display['75%'][x]) for x in order])}")
+print(f"Max   | {' | '.join([' ' * max(0, len(x) - len(str(display['max'][x]))) + str(display['max'][x]) for x in order])}")
