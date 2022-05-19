@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import argparse
+import json
 
 import format_data
 import metrics
@@ -11,6 +12,9 @@ import metrics
 TO_EXCLUDE = ["Hogwarts House", "First Name", "Last Name", "Birthday", "Index", "Best Hand", "Arithmancy", "Astronomy", "Care of Magical Creatures"]
 COLORS = {'Hufflepuff': 'yellow', 'Gryffindor': 'red', 'Slytherin': 'green', 'Ravenclaw': 'blue'}
 HOUSES = ['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw']
+
+alpha = 0.4
+
 
 def plot(cost_plot, num_iters):
     legend = []
@@ -24,14 +28,15 @@ def plot(cost_plot, num_iters):
     plt.legend(legend)
     plt.show()
 
-def sigmoid_function(alpha, matrix, theta, args):
+def sigmoid_function(alpha, matrix, theta, args=None):
     # h
     result = 1 / (1 + np.exp(-(matrix.dot(theta))))
     regularization = 0
-    if args.l1:
-        regularization = (alpha / (2 * line_train)) * np.sum(np.square(theta))
-    elif args.l2:
-        regularization = (alpha / (2 * line_train)) * np.sum(np.abs(theta))
+    if args:
+        if args.l1:
+            regularization = (alpha / (2 * line_train)) * np.sum(np.square(theta))
+        elif args.l2:
+            regularization = (alpha / (2 * line_train)) * np.sum(np.abs(theta))
 
     return result + regularization
 
@@ -54,7 +59,7 @@ def gradient(alpha, matrix, expected_results, theta, c, args):
 def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, args, matrix_test=None, test_expected_house_object=None, test_expected_house_list=None):
     temp = np.reshape([[0.0] * col_train], (col_train, 1))
     if args.loss:
-        cost_plot = {'Hufflepuff': [], 'Gryffindor': [], 'Slytherin': [], 'Ravenclaw': []}
+        loss_plot = {'Hufflepuff': [], 'Gryffindor': [], 'Slytherin': [], 'Ravenclaw': []}
     if args.early_stopping:
         best_loss = None
         unchanged_epoch = 0
@@ -62,42 +67,48 @@ def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, 
     for i in range(0, num_iters):
         # Loop on houses for the one vs all algorithm
         for key in theta:
-            cost = 0
             current_general_loss = 0
+            
             # Recalculate the weights (theta) for each feature and save it in a temporary variable
             for index in range(0, col_train):
                 temp[index] = theta[key][index] - ((alpha  / line_train) * gradient(alpha, matrix_train, train_expected_house_object[key], theta[key], index, args))
+            
             # Update all the theta at once
             for index in range(0, col_train):
                 theta[key][index] = temp[index]
+
+            # Plot the loss on the training set after updating the weights
             if args.loss:
-                cost = cost_function(alpha, theta[key], matrix_train, train_expected_house_object[key], args)
-                cost_plot[key].append(cost)
+                loss = cost_function(alpha, theta[key], matrix_train, train_expected_house_object[key], args)
+                loss_plot[key].append(loss)
+            
+            # Calculate the total loss (loss for each house) on the testing set
             if args.early_stopping:
-                    current_general_loss += cost_function(alpha, theta[key], matrix_test, test_expected_house_object[key], args)
+                current_general_loss += cost_function(alpha, theta[key], matrix_test, test_expected_house_object[key], args)
 
         if args.early_stopping:
-            print(i, current_general_loss, best_loss)
-            print()
             if best_loss == None:
                 best_loss = current_general_loss
-            elif current_general_loss + 0.05 / i < best_loss:
-                break
+            elif current_general_loss + 0.00001 > best_loss or current_general_loss == best_loss:
+                unchanged_epoch += 1
             elif current_general_loss < best_loss:
                 best_loss = current_general_loss
-            elif current_general_loss == best_loss:
-                unchanged_epoch += 1
             if unchanged_epoch == 5:
                 break
 
+    print(f"Total epoch performed : {i}")
     if args.loss:
-        plot(cost_plot, i + 1)
+        plot(loss_plot, i + 1)
+    
+    for key in theta:
+        theta[key] = theta[key].tolist()
+    with open(args.path_to_weights, 'w') as f:
+        json.dump(theta, f)
 
     return theta
 
 def main(matrix_train, train_houses_list, args, matrix_test=None, test_houses_list=None):
-    alpha = 0.4
-    num_iters = 400
+    num_iters = 2000
     test_expected_house = None
 
     # Initialize the weights
@@ -122,17 +133,24 @@ def main(matrix_train, train_houses_list, args, matrix_test=None, test_houses_li
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parse for bonus')
     parser.add_argument('--path', dest='path', help='Path to csv data')
+    parser.add_argument('--path_to_weights', dest='path_to_weights', help='Path to save the weights')
     parser.add_argument('--loss', dest='loss', default=False, action='store_true', help='Used to show the loss function graph when training is over')
     parser.add_argument('--l1', dest='l1', default=False, action='store_true', help='Used to reduce the impact of huge weights to prevent overfitting')
     parser.add_argument('--l2', dest='l2', default=False, action='store_true', help='Used to reduce the impact of huge weights to prevent overfitting')
-    parser.add_argument('--early_stopping', dest='early_stopping', default=False, action='store_true', help='Split the training data set in training and testsing set so that we can measure how our model perform on data that it hasn\'t used to train and stop when we start to lose precision on the etsting dataset to prevent overfitting')
+    parser.add_argument('--early_stopping', dest='early_stopping', default=False, action='store_true', help='Split the training data set in training and testsing set so that we can measure how our model perform on data that it hasn\'t used to train and stop when the loss on the testing dataset to prevent overfitting')
 
     args = parser.parse_args()
     if args.l1 and args.l2:
         sys.exit('Impossible to use l1 and l2 at once')
 
     if not args.path:
-        sys.exit("No name file")
+        sys.exit("No file given")
+
+    if not args.path_to_weights:
+        sys.exit("No path to save weights have been given")
+    else:
+        if len(args.path_to_weights) < 6 or not args.path_to_weights[-5:] == '.json':
+            sys.exit("Weights must be saved in a json file")
 
     try:
         df = pd.read_csv(args.path)

@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 
 def precision(theta, expected_results, matrix, lines):
-    my_y = []
+    object_to_write = {'Hogwarts House': []}
     correct_prediction = 0
 
     # Turn into a list to avoid issue with indexes when using early stopping
@@ -17,15 +18,24 @@ def precision(theta, expected_results, matrix, lines):
         # The most probable house will be our prediction
         myguess = max(hufflepuff, gryffindor, slytherin, ravenclaw)
 
+        if myguess == hufflepuff:
+            prediction = 'Hufflepuff'
+        if myguess == gryffindor:
+            prediction = 'Gryffindor'
+        if myguess == slytherin:
+            prediction = 'Slytherin'
+        if myguess == ravenclaw:
+            prediction = 'Ravenclaw'
+
         # We check our prediction with the reality
-        if (myguess == hufflepuff and list_expected_results[l] == 'Hufflepuff'):
+        if prediction == list_expected_results[l]:
             correct_prediction += 1
-        if (myguess == gryffindor and list_expected_results[l] == 'Gryffindor'):
-            correct_prediction += 1
-        if (myguess == slytherin and list_expected_results[l] == 'Slytherin'):
-            correct_prediction += 1
-        if (myguess == ravenclaw and list_expected_results[l] == 'Ravenclaw'):
-            correct_prediction += 1
+
+        object_to_write['Hogwarts House'].append(prediction)
+
+    df = pd.DataFrame(object_to_write)
+
+    df.to_csv('house.csv', index_label='Index')
 
     # print("Accuracy  : ", correct_prediction / lines)
     return correct_prediction / lines
