@@ -19,6 +19,8 @@ def scatter_plot(df):
     plt.scatter(slytherin_defense, slytherin_astro, color='green', edgecolor='black')
     plt.scatter(ravenclaw_defense, ravenclaw_astro, color='blue', edgecolor='black')
     plt.legend(['Hufflepuff', 'Gryffindor', 'Slytherin', 'Ravenclaw'])
+    plt.xlabel('Defense Against the Dark Arts')
+    plt.ylabel('Astronomy')
 
     plt.show()
 

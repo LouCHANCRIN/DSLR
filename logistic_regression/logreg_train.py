@@ -33,11 +33,14 @@ def sigmoid_function(alpha, matrix, theta, args=None):
     result = 1 / (1 + np.exp(-(matrix.dot(theta))))
     regularization = 0
     if args:
+        # Add the absolute values of the coeficient to shrink the less improtant features
         if args.l1:
-            regularization = (alpha / (2 * line_train)) * np.sum(np.square(theta))
-        elif args.l2:
             regularization = (alpha / (2 * line_train)) * np.sum(np.abs(theta))
 
+        # Add the square value of the coeficient to minimize the impact of the b
+        elif args.l2:
+            regularization = (alpha / (2 * line_train)) * np.sum(np.square(theta))
+        
     return result + regularization
 
 def cost_function(alpha, theta, matrix, expected_results, args):
@@ -86,17 +89,28 @@ def log_reg(matrix_train, theta, alpha, num_iters, train_expected_house_object, 
             if args.early_stopping:
                 current_general_loss += cost_function(alpha, theta[key], matrix_test, test_expected_house_object[key], args)
 
+        # Stop the loop if the loss doesnt decrease for 5 iteration
         if args.early_stopping:
+            # Intialize the loss
             if best_loss == None:
                 best_loss = current_general_loss
+            
+            # If current loss is barely smaller or equal to best loss, we consider it unchanged
+            # If the current loss is much higher than the best loss, we will exit in a further if
             elif current_general_loss + 0.00001 > best_loss or current_general_loss == best_loss:
                 unchanged_epoch += 1
+
+            # If current loss < best loss, we update best loss and reset unchanged epoch
             elif current_general_loss < best_loss:
                 best_loss = current_general_loss
-            if unchanged_epoch == 5:
+                unchanged_epoch = 0
+
+            # If the loss has not changed for 5 iterations or started to increase, we stop the training
+            if unchanged_epoch == 5 or current_general_loss > best_loss:
                 break
 
-    print(f"Total epoch performed : {i}")
+    if args.early_stopping:
+        print(f"Total epoch performed : {i}")
     if args.loss:
         plot(loss_plot, i + 1)
     
@@ -140,8 +154,8 @@ if __name__ == "__main__":
     parser.add_argument('--early_stopping', dest='early_stopping', default=False, action='store_true', help='Split the training data set in training and testsing set so that we can measure how our model perform on data that it hasn\'t used to train and stop when the loss on the testing dataset to prevent overfitting')
 
     args = parser.parse_args()
-    if args.l1 and args.l2:
-        sys.exit('Impossible to use l1 and l2 at once')
+    if sum([args.l1, args.l2]) > 1:
+        sys.exit('You can use only one regularization at a time')
 
     if not args.path:
         sys.exit("No file given")
@@ -154,9 +168,10 @@ if __name__ == "__main__":
 
     try:
         df = pd.read_csv(args.path)
+        number_of_examples, _ = df.shape
+        df['Bias'] = [1.0] * number_of_examples
     except:
         sys.exit(f"Failed to read file {args.path}")
-    
 
     if args.early_stopping:
         train = df.sample(frac=0.8)

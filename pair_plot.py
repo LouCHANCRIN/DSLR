@@ -19,7 +19,8 @@ def main():
     # Remove best hand, arithmancy and care of magical creatures because
     # they have an omogenous distribution across houses
     # Remove Astronomy because it is similar to defense against the dark arts
-    data = data.drop(['Best Hand', 'Astronomy', 'Arithmancy', 'Care of Magical Creatures'], axis=1)
+    data = data.drop(['Best Hand', 'Arithmancy', 'Care of Magical Creatures'], axis=1)
+    # data = data.drop(['Best Hand', 'Astronomy', 'Arithmancy', 'Care of Magical Creatures'], axis=1)
     sns.pairplot(data, hue="Hogwarts House")
     plt.show()
 

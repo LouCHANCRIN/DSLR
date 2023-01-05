@@ -22,6 +22,8 @@ def set_house(house, expected_results):
     return (house)
 
 def scale(matrix, line, col):
+    # We've added a column for the bias and we dont want to scale it
+    col -= 1
     col_mean = np.nanmean(matrix, axis=0)
     inds = np.where(np.isnan(matrix))
     matrix[inds] = np.take(col_mean, inds[1])

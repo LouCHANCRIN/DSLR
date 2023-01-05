@@ -6,7 +6,8 @@ import math
 ressource = sys.argv[1]
 df = pd.read_csv(ressource)
 
-df = df.drop(['First Name', 'Last Name', 'Best Hand', 'Birthday'], axis=1)
+df = df.drop(['First Name', 'Last Name', 'Best Hand', 'Birthday', 'Hogwarts House'], axis=1)
+
 line, col = np.shape(df)
 
 data_to_sort = {}
@@ -23,7 +24,7 @@ def sort_data(data_to_sort):
         data_to_sort[key] = [x for x in data_to_sort[key] if x == x]
 
         for i in range(0, len(data_to_sort[key])):
-            for j in range(0, len(data_to_sort[key])):
+            for j in range(i + 1, len(data_to_sort[key])):
                 # Both not NaN
                 if (data_to_sort[key][i] == data_to_sort[key][i] and data_to_sort[key][j] == data_to_sort[key][j]):
                     # Swap
@@ -33,7 +34,7 @@ def sort_data(data_to_sort):
                         data_to_sort[key][j] = tmp
     return data_to_sort
 
-sorted_data= sort_data(data_to_sort)
+sorted_data = sort_data(data_to_sort)
 
 def fill_feature(sorted_data):
     for column in sorted_data:
@@ -51,20 +52,15 @@ def fill_feature(sorted_data):
         else:
             calculated_mean = 0
 
+            # NaN are removed so the max is always at the end and the min at the beggining
             min_found = sorted_data[column][0]
-            max_found = sorted_data[column][0]
-            valid_value_count = 0
+            max_found = sorted_data[column][-1]
+
             for i in range(0, column_length):
-                valid_value_count += 1
                 calculated_mean += sorted_data[column][i]
 
-                if sorted_data[column][i] > max_found:
-                    max_found = sorted_data[column][i]
-
-                if sorted_data[column][i] < min_found:
-                    min_found = sorted_data[column][i]
-
             calculated_mean /= column_length
+
             std = 0
             for i in range(0, column_length):
                 std += (sorted_data[column][i] - calculated_mean) ** 2
@@ -72,11 +68,13 @@ def fill_feature(sorted_data):
             std = math.sqrt(std)
 
 
-            p_25 = str(sorted_data[column][int(valid_value_count * 0.75)])
-            p_50 = str(sorted_data[column][int(valid_value_count * 0.5)])
-            p_75 = str(sorted_data[column][int(valid_value_count * 0.25)])
+            p_25 = str(sorted_data[column][int(column_length * 0.25)])
+            p_50 = str(sorted_data[column][int(column_length * 0.5)])
+            p_75 = str(sorted_data[column][int(column_length * 0.75)])
             
             display['Mean'][column] = str(calculated_mean)[0:min(len(str(calculated_mean)), len(column))]
+
+            # STD represent the variance between the data and the mean
             display['std'][column] = str(std)[0:min(len(str(std)), len(column))]
             display['min'][column] = str(min_found)[0:min(len(str(min_found)), len(column))]
             display['25%'][column] = p_25[0:min(len(p_25), len(column))]

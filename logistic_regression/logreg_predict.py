@@ -26,6 +26,8 @@ if __name__ == "__main__":
 
     try:
         df = pd.read_csv(args.path)
+        number_of_examples, _ = df.shape
+        df['Bias'] = [1.0] * number_of_examples
     except:
         sys.exit(f"Failed to read file {args.path}")
 
